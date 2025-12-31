@@ -1,5 +1,5 @@
 import './App.css';
-import MyComponent from './components/MyComponent';
+import MyComponent from './components/NewMyComponet';
 import NewComponent from './components/NewComponent';
 
 function App() {
