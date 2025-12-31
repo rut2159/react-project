@@ -1,16 +1,26 @@
 import './App.css';
-import MyComponent from './components/MyComponent';
-import NewComponent from './components/NewComponent';
-
+import CookingComponent from './Cooking/CookingComponent';
+import { useState } from 'react'
 function App() {
+          const [showCookings, setShowCookings] = useState(false);
+
+          const toggleCookingsVisibility = () => {
+        setShowCookings(!showCookings);
+    };
+
   return (
     <div className="App">
-      <MyComponent />
       <div style={{ marginTop: 20 }}>
-        <NewComponent
-          title={"A friendly new component"}
-          onAction={(msg) => console.log('NewComponent action:', msg)}
-        />
+
+       {/* cooking */}
+     <button onClick={toggleCookingsVisibility}>
+                {showCookings ? 'להסתרת התבשילים' : 'להצגת התבשילים'}
+            </button>
+            {showCookings && <CookingComponent />}
+
+
+              
+
       </div>
     </div>
   );

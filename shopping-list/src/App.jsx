@@ -12,6 +12,7 @@ function App() {
   function showCurList() {
     setShowCur(!showCur);
   }
+  
   return (
 
     <>
@@ -19,7 +20,11 @@ function App() {
       {showAllOption ? <ShoppingList /> : ''}
       <button onClick={showCurList}>{showCur ? 'hide' : 'show'} current shabbat list</button>
       {showCur ? <ShowListToCurrentShabbat /> : ''}
+
+      
     </>
+
+
   )
 }
 
