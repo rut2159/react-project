@@ -19,5 +19,4 @@ function CookingComponent() {
     </div>
   );
 }
-
 export default CookingComponent;
