@@ -1,124 +1,39 @@
-import { useState, useEffect } from "react";
-//לרשימת קניות בסיסית
-import { addNewProduct, getBasicShoppingList, deleteProduct } from './data/BasicShoppingList.js';
-//לרשימת קניות לאורחים
-import { getGuestsShoppingList, addNewProductForGuests, deleteProductForGuests } from "./data/guestsShoppingList.js";
-//לרשימת קניות מתנות עבור אורחים
-import { getShoppingListWhenTraveling, addNewProductWhenTraveing, deleteProductWhenTraveling } from "./data/ShoppingListWhenTraveling.js";
-//רכיב להצגת מוצר בודד
-import { Product } from "./Product.jsx";
-import { ShowListToCurrentShabbat } from "./ShowListToCurrentShabbat.jsx";
+import React from "react"
+import { useGlobalContext } from "../context/GlobalContext.jsx"
+// import "./shopping.css" // עדכון לשם תקין
 
-export const ShoppingList = () => {
-    const [BasicList, setBasicList] = useState([]);
-    const [GuestsList, setGuestsList] = useState([]);
-    const [TravelingList, setTravelingList] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
+export default function ShoppingList() {
+  const { derivedShopping, togglePurchased } = useGlobalContext()
 
-    const deleteProductById = async (id, list) => {
-        if (list === 'basic') {
-            const newProducts = await deleteProduct(id);
-            setBasicList(newProducts);
-        } else if (list === 'guests') {
-            const newProducts = await deleteProductForGuests(id);
-            setGuestsList(newProducts);
-        }
-        else if (list === 'traveling') {
-            const newProducts = await deleteProductWhenTraveling(id);
-            setTravelingList(newProducts);
-        }
-    };
-    const loadAllLists = async () => {
-        setLoading(true);
-        try {
-            const basiclist = await getBasicShoppingList();
-            setBasicList(basiclist);
-            const guestsList = await getGuestsShoppingList();
-            setGuestsList(guestsList);
-            const travelingList = await getShoppingListWhenTraveling();
-            setTravelingList(travelingList);
-        } catch (error) {
-            console.log('something bad happen', error);
-            setError(true);
-        } finally {
-            setLoading(false);
-        }
-    }
+  console.debug("ShoppingList derivedShopping:", derivedShopping)
 
-    useEffect(() => {
-        loadAllLists();
-    }, [])
-    const addProduct = async (list, event) => {
-        event.preventDefault();
-        const newProduct = {
-            id: list === 'basic' ? BasicList.length + 1 : GuestsList.length + 201,
-            name: event.target.name.value,
-            price: event.target.price.value,
-            quantity: event.target.quantity.value,
-        }
-        event.target.reset();
-        if (list === 'basic') {
-            const newProducts = await addNewProduct(newProduct);
-            setBasicList(newProducts);
-        }
-        if (list === 'guests') {
-            const newProducts = await addNewProductForGuests(newProduct);
-            setGuestsList(newProducts);
-        }
-        if (list === 'traveling') {
-            const newProducts = await addNewProductWhenTraveing(newProduct);
-            setTravelingList(newProducts);
-        }
-    }
+  if (!derivedShopping || derivedShopping.length === 0) {
     return (
-        <div className="shopping-lists-grid">
-            <section className="list-column basic">
-                <h2 className="list-title">Basic Shopping List</h2>
-                <h4 className="status"> {loading && 'loading....'} </h4>
-                <h4 className="status error"> {error && 'something bad happen, try again later'} </h4>
-                <div className="list-items">
-                    {BasicList.map(b => <Product key={b.id} className="product-card" product={b} onDelete={(id) => deleteProductById(id, 'basic')} />)}
-                </div>
-                <form className="add-form" onSubmit={(event) => addProduct('basic', event)}>
-                    <input className="input" type="text" name="name" placeholder='name' required />
-                    <input className="input" type="number" name="price" placeholder='price' required />
-                    <input className="input" type="number" name="quantity" placeholder='quantity' required />
-                    <button className="btn primary"> add new product </button>
-                </form>
-            </section>
-
-            <section className="list-column guests">
-                <h2 className="list-title">Guests Shopping List</h2>
-                <h4 className="status"> {loading && 'loading....'} </h4>
-                <h4 className="status error"> {error && 'something bad happen, try again later'} </h4>
-                <div className="list-items">
-                    {GuestsList.map(b => <Product key={b.id} className="product-card" product={b} onDelete={(id) => deleteProductById(id, 'guests')} />)}
-                </div>
-                <form className="add-form" onSubmit={(event) => addProduct('guests', event)}>
-                    <input className="input" type="text" name="name" placeholder='name' required />
-                    <input className="input" type="number" name="price" placeholder='price' required />
-                    <input className="input" type="number" name="quantity" placeholder='quantity' required />
-                    <button className="btn primary"> add new product </button>
-                </form>
-            </section>
-
-            <section className="list-column traveling">
-                <h2 className="list-title">Traveling Shopping List</h2>
-                <h4 className="status"> {loading && 'loading....'} </h4>
-                <h4 className="status error"> {error && 'something bad happen, try again later'} </h4>
-                <div className="list-items">
-                    {TravelingList.map(b => <Product key={b.id} className="product-card" product={b} onDelete={(id) => deleteProductById(id, 'traveling')} />)}
-                </div>
-                <form className="add-form" onSubmit={(event) => addProduct('traveling', event)}>
-                    <input className="input" type="text" name="name" placeholder='name' required />
-                    <input className="input" type="number" name="price" placeholder='price' required />
-                    <input className="input" type="number" name="quantity" placeholder='quantity' required />
-                    <button className="btn primary"> add new product </button>
-                </form>
-            </section>
-
-        </div>
-
+      <div style={{ padding: 16 }}>
+        <h2>רשימת קניות לשבת</h2>
+        <p style={{ color: "#c00" }}>אין פריטים להציג — derivedShopping ריקה.</p>
+        <details style={{ whiteSpace: "pre-wrap", background: "#f8f8f8", padding: 8, borderRadius: 6 }}>
+          <summary>הצג אובייקט derivedShopping (לבדיקה)</summary>
+          <pre style={{ maxHeight: 200, overflow: "auto" }}>{JSON.stringify(derivedShopping, null, 2)}</pre>
+        </details>
+      </div>
     )
+  }
+
+  return (
+    <div style={{ padding: 16 }}>
+      <h2>רשימת קניות לשבת</h2>
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {derivedShopping.map(it => (
+          <li key={it.id} style={{ display: "flex", justifyContent: "space-between", padding: 8, borderRadius: 8 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input type="checkbox" checked={!!it.purchased} onChange={() => togglePurchased(it.id)} />
+              <span>{it.name}</span>
+            </label>
+            <div style={{ color: "#666" }}>{it.qty || 1} {it.unit || ""}</div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
