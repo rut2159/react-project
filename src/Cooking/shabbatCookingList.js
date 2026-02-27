@@ -1,25 +1,25 @@
 const shabbatCookingList = {
-  basic: [
+  "בסיסי": [
     "חלה",
     "סלט ירקות",
     "טחינה",
     "חומוס"
   ],
 
-  firstMeal: [
+ " סעודה ראשונה": [
     "דג חריימה",
     "מרק עוף",
     "עוף בתנור",
     "אורז לבן"
   ],
 
-  secondMeal: [
+ " סעודה שנייה": [
     "חמין",
     "קוגל אטריות",
     "סלט כרוב"
   ],
 
-  thirdMeal: [
+ " סעודה שלישית": [
     "טונה עם ירקות",
     "חצילים במיונז",
     "לחמניות"
@@ -28,10 +28,3 @@ const shabbatCookingList = {
 
 export default shabbatCookingList;
 export const getShabbatCookingList = () => shabbatCookingList;
-// export function getShabbatCookings() {
-//   return new Promise((resolve, reject) => {
-//     setTimeout(() => {
-//       resolve(shabbatCookingList); // אחרי 1 שניה מחזירה את הנתונים
-//     }, 1000);
-//   });
-// }
