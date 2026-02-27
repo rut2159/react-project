@@ -71,3 +71,13 @@ body {
   }
 }
 /* end of cooking styles */
+.home-task { margin: 12px 0; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fff; }
+.home-task-title { margin: 0 0 8px 0; font-size: 1.05rem; }
+.home-task-add { display: flex; gap: 8px; margin-bottom: 8px; }
+.home-task-input { flex: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; }
+.home-task-add-btn { padding: 6px 10px; background: #1976d2; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+.home-task-list { list-style: none; padding: 0; margin: 0; }
+.home-task-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-bottom: 1px dashed #eee; }
+.home-task-item:last-child { border-bottom: none; }
+.home-task-item.done .home-task-text { text-decoration: line-through; opacity: 0.6; }
+.home-task-remove-btn { background: transparent; border: none; color: #b00020; font-size: 1.1rem; cursor: pointer; padding: 0 6px; }
