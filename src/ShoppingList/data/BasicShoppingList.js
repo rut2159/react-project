@@ -1,5 +1,5 @@
 
-const BasicShoppingList = [
+export const BasicShoppingList = [
   { id: 1, name: "fish", price: 100 ,"quantity":1},
   { id: 2, name: "chicken", price: 45,"quantity":1 },
   { id: 3, name: "bread", price: 12 ,"quantity":4},

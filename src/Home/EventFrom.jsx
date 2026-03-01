@@ -1,28 +1,21 @@
-import { useState } from "react";
+import { useGlobalContext } from "../context/GlobalContext.jsx";
 
 function EventForm() {
-    const [eventData, setEventData] = useState({
-        startTime: "",
-        location: "home",
-        mealsCount: 1,
-        hasGuests: false,
-    });
+    const { settings, updateSetting } = useGlobalContext();
 
     function handleChange(e) {
         const { name, value, type, checked } = e.target;
-        setEventData({
-            ...eventData,
-            [name]: type === "checkbox" ? checked : value,
-        });
+        updateSetting({ [name]: type === "checkbox" ? checked : value });
     }
 
     return (
         <form className="event-form">
             <label>
-                שעת כניסת השבת:        <input
+                שעת כניסת השבת:
+                <input
                     type="time"
                     name="startTime"
-                    value={eventData.startTime}
+                    value={settings.startTime || ""}
                     onChange={handleChange}
                 />
             </label>
@@ -31,7 +24,7 @@ function EventForm() {
                 מיקום:
                 <select
                     name="location"
-                    value={eventData.location}
+                    value={settings.location}
                     onChange={handleChange}
                 >
                     <option value="home">בבית</option>
@@ -39,7 +32,7 @@ function EventForm() {
                 </select>
             </label>
 
-            {eventData.location === "home" && (
+            {settings.location === "home" && (
                 <label >
                     כמות סעודות בבית:
                     <input
@@ -47,18 +40,17 @@ function EventForm() {
                         min={1}
                         max={3}
                         name="mealsCount"
-                        value={eventData.mealsCount}
+                        value={settings.mealsCount || 1}
                         onChange={handleChange}
                     />
                 </label>
             )}
-            {eventData.location === "home" && (
-
+            {settings.location === "home" && (
             <label>
                 <input
                     type="checkbox"
                     name="hasGuests"
-                    checked={eventData.hasGuests}
+                    checked={!!settings.hasGuests}
                     onChange={handleChange}
                 />
                 יש אורחים

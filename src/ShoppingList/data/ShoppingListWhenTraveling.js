@@ -1,5 +1,5 @@
 
-const ShoppingListWhenTraveling = [
+export const ShoppingListWhenTraveling = [
   { id: 1, name: "gift", price: 100, quantity: 1 },
 ];
 

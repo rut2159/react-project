@@ -2,37 +2,41 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
+// bring in the external data files so the context always reflects their contents
+import cookingData from '../Cooking/shabbatCookingList.js'
+import { shabbatSettings as fileShabbatSettings } from '../ShoppingList/data/shabbatSettings.js'
+import { BasicShoppingList as fileBasicShoppingList } from '../ShoppingList/data/BasicShoppingList.js'
+import { guestsShoppingList as fileGuestsShoppingList } from '../ShoppingList/data/guestsShoppingList.js'
+import { ShoppingListWhenTraveling as fileTravelShoppingList } from '../ShoppingList/data/ShoppingListWhenTraveling.js'
+
 const GlobalContext = createContext(null)
 
+// the usual runtime settings (startTime/location/meal count/guests)
+// remain unchanged, but we also expose the contents of the configuration
+// file via `fileSettings` on the context value so that the consumer can
+// see exactly what is exported from shabbatSettings.js.
 const initialSettings = {
   startTime: '',
   location: 'home',
   mealsCount: 2,
-  guests: false,
+  hasGuests: false,
 }
-// ...existing code...
-const shabbatCookingList = {
-  basic: ["חלה","סלט ירקות","טחינה","חומוס"],
-  firstMeal: ["דג חריימה","מרק עוף","עוף בתנור","אורז לבן"],
-  secondMeal: ["חמין","קוגל אטריות","סלט כרוב"],
-  thirdMeal: ["טונה עם ירקות","חצילים במיונז","לחמניות"]
-};
 
-export default shabbatCookingList
-export const getShabbatCookingList = () => shabbatCookingList
-// ...existing code...
-const defaultBaseShopping = [
-  { id: uuidv4(), name: 'חלה', qty: 2, unit: 'יח׳' },
-  { id: uuidv4(), name: 'לחם', qty: 1, unit: 'יח׳' },
-  { id: uuidv4(), name: 'חמאה', qty: 1, unit: 'חב׳' },
-]
+// default arrays pulled directly from the standalone modules
+const defaultBaseShopping = fileBasicShoppingList
+const defaultGuestShopping = fileGuestsShoppingList
+const defaultTravelShopping = fileTravelShoppingList
+const defaultShabbatCooking = cookingData
+
+// expose the raw file exports alongside the state-managed values
+const fileSettings = fileShabbatSettings
+
 
 const defaultMealAdditions = {
   1: [{ id: uuidv4(), name: 'עוף', qty: 1, unit: 'יח׳' }],
   2: [{ id: uuidv4(), name: 'דג', qty: 1, unit: 'יח׳' }],
 }
 
-const defaultGuestShopping = [{ id: uuidv4(), name: 'מתנה למארח', qty: 1, unit: 'יח׳' }]
 
 const defaultBaseTasks = [
   { id: uuidv4(), title: 'לנקות את הסלון', durationMin: 30, day: 'יום שישי', forGuests: false },
@@ -77,6 +81,10 @@ export const GlobalProvider = ({ children }) => {
   const [guestShopping, setGuestShopping] = useState(() =>
     safeLoad('shabbat_guest_shopping', defaultGuestShopping)
   )
+  // a separate list for when we're travelling; also seeded from file
+  const [travelShopping, setTravelShopping] = useState(() =>
+    safeLoad('shabbat_travel_shopping', defaultTravelShopping)
+  )
 
   const [tasksBase, setTasksBase] = useState(() => safeLoad('shabbat_tasks_base', defaultBaseTasks))
   const [tasksGuest, setTasksGuest] = useState(() => safeLoad('shabbat_tasks_guest', defaultGuestTasks))
@@ -93,6 +101,7 @@ export const GlobalProvider = ({ children }) => {
     localStorage.setItem('shabbat_shopping_base', JSON.stringify(shoppingBase))
     localStorage.setItem('shabbat_meal_additions', JSON.stringify(mealAdditions))
     localStorage.setItem('shabbat_guest_shopping', JSON.stringify(guestShopping))
+    localStorage.setItem('shabbat_travel_shopping', JSON.stringify(travelShopping))
     localStorage.setItem('shabbat_tasks_base', JSON.stringify(tasksBase))
     localStorage.setItem('shabbat_tasks_guest', JSON.stringify(tasksGuest))
     localStorage.setItem('shabbat_cook_base', JSON.stringify(cookBase))
@@ -103,6 +112,7 @@ export const GlobalProvider = ({ children }) => {
   }, [
     settings,
     shoppingBase,
+    travelShopping,
     mealAdditions,
     guestShopping,
     tasksBase,
@@ -122,13 +132,13 @@ export const GlobalProvider = ({ children }) => {
       const extras = (mealAdditions && mealAdditions[i]) || []
       extras.forEach(x => mergeItems(acc, x))
     }
-    if (settings.guests) (guestShopping || []).forEach(i => mergeItems(acc, i))
+    if (settings.hasGuests) (guestShopping || []).forEach(i => mergeItems(acc, i))
     return Object.values(acc).map(it => ({ ...it, purchased: !!(purchasedItems[it.id] || purchasedItems[it.name]) }))
   }, [shoppingBase, mealAdditions, guestShopping, settings, purchasedItems])
 
   const derivedTasks = useMemo(() => {
     const all = [...(tasksBase || [])]
-    if (settings.guests) all.push(...(tasksGuest || []))
+    if (settings.hasGuests) all.push(...(tasksGuest || []))
     return all.map(t => ({ ...t, done: !!doneTasks[t.id] }))
   }, [tasksBase, tasksGuest, settings, doneTasks])
 
@@ -203,11 +213,20 @@ export const GlobalProvider = ({ children }) => {
         shoppingBase,
         mealAdditions,
         guestShopping,
+        travelShopping,
         derivedShopping,
         addShoppingBaseItem,
         editShoppingBaseItem,
         deleteShoppingBaseItem,
         togglePurchased,
+
+        // copies of the raw file exports (for reference / debugging)
+        fileBasicShoppingList,
+        fileGuestsShoppingList,
+        fileTravelShoppingList,
+        fileSettings,
+        fileShabbatCookingList: defaultShabbatCooking,
+        setTravelShopping,
 
         tasksBase,
         tasksGuest,

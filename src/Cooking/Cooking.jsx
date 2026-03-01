@@ -1,25 +1,239 @@
 import React from 'react'
 import { useGlobalContext } from '../context/GlobalContext.jsx'
-import './cooking.css'
 
 export default function Cooking() {
   const { derivedCookings, toggleCookingDone, totalRemainingCookingMinutes } = useGlobalContext()
 
+  const completedCount = (derivedCookings || []).filter(c => c.done).length
+  const totalCount = (derivedCookings || []).length
+  const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
+
+  if (!derivedCookings || derivedCookings.length === 0) {
+    return (
+      <div>
+        <div style={{
+          background: 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
+          borderRadius: '20px',
+          padding: '40px',
+          color: 'white',
+          marginBottom: '40px',
+          boxShadow: 'var(--shadow-lg)',
+          textAlign: 'center',
+        }}>
+          <h1 style={{ fontSize: '3em', margin: 0, color: 'white', WebkitTextFillColor: 'white' }}>
+            🍽️ בישול
+          </h1>
+        </div>
+        <div style={{
+          background: 'var(--bg-card)',
+          borderRadius: '16px',
+          padding: '40px',
+          boxShadow: 'var(--shadow-md)',
+          textAlign: 'center',
+          border: '1px solid var(--border-accent)',
+        }}>
+          <p style={{ fontSize: '1.2em', color: 'var(--text-secondary)', margin: '0 0 12px 0' }}>
+            אין בישולים להציג
+          </p>
+          <p style={{ fontSize: '0.95em', color: 'var(--text-secondary)', margin: 0 }}>
+            הוסף בישולים חדשים כשתהיה מוכן
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div style={{ padding: 16 }}>
-      <h2>בישולים לשבת</h2>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+    <div>
+      {/* Header */}
+      <div style={{
+        background: 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
+        borderRadius: '20px',
+        padding: '40px',
+        color: 'white',
+        marginBottom: '40px',
+        boxShadow: 'var(--shadow-lg)',
+      }}>
+        <h1 style={{
+          fontSize: '3em',
+          margin: '0 0 24px 0',
+          color: 'white',
+          WebkitTextFillColor: 'white',
+        }}>
+          🍽️ בישול
+        </h1>
+        
+        {/* Progress Bar */}
+        <div style={{ marginBottom: '12px' }}>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: '8px',
+            fontSize: '0.95em',
+            fontWeight: 600,
+          }}>
+            <span>התקדמות בישול</span>
+            <span>{completedCount} / {totalCount}</span>
+          </div>
+          <div style={{
+            background: 'rgba(255,255,255,0.3)',
+            borderRadius: '10px',
+            height: '10px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              background: 'white',
+              height: '100%',
+              width: `${progressPercent}%`,
+              transition: 'width 0.3s ease',
+            }} />
+          </div>
+        </div>
+        <p style={{ margin: 0, opacity: 0.95 }}>
+          {progressPercent === 100 ? '✅ סיימת בישול!' : `${Math.round(100 - progressPercent)}% נותר`}
+        </p>
+      </div>
+
+      {/* Cooking List */}
+      <div style={{
+        display: 'grid',
+        gap: '12px',
+        marginBottom: '20px',
+      }}>
         {derivedCookings.map(c => (
-          <li key={c.id} style={{ display: 'flex', justifyContent: 'space-between', padding: 8, borderRadius: 8 }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <input type="checkbox" checked={!!c.done} onChange={() => toggleCookingDone(c.id)} />
-              <span>{c.name}</span>
+          <div
+            key={c.id}
+            style={{
+              background: 'white',
+              borderRadius: '12px',
+              padding: '16px',
+              boxShadow: 'var(--shadow-sm)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              transition: 'all 0.3s ease',
+              opacity: c.done ? 0.6 : 1,
+              borderLeft: c.done ? '4px solid var(--success-color)' : '4px solid var(--danger-color)',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = 'var(--shadow-md)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'var(--shadow-sm)'
+            }}
+          >
+            <label style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '14px',
+              flex: 1,
+              cursor: 'pointer',
+            }}>
+              <input
+                type="checkbox"
+                checked={!!c.done}
+                onChange={() => toggleCookingDone(c.id)}
+                style={{
+                  width: '22px',
+                  height: '22px',
+                  cursor: 'pointer',
+                  accentColor: 'var(--success-color)',
+                }}
+              />
+              <div>
+                <p style={{
+                  margin: 0,
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  textDecoration: c.done ? 'line-through' : 'none',
+                }}>
+                  {c.name}
+                </p>
+              </div>
             </label>
-            <div style={{ color: '#666' }}>{c.durationMin || 0} דק</div>
-          </li>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}>
+              <span style={{
+                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                color: 'white',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '0.85em',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}>
+                ⏱️ {c.durationMin || 0} דק
+              </span>
+            </div>
+          </div>
         ))}
-      </ul>
-      <p style={{ color: '#666' }}>זמן הכנה מוערך שנותר: {totalRemainingCookingMinutes} דק</p>
+      </div>
+
+      {/* Summary */}
+      <div style={{
+        background: 'var(--bg-card)',
+        borderRadius: '16px',
+        padding: '24px',
+        boxShadow: 'var(--shadow-md)',
+        border: '1px solid var(--border-accent)',
+      }}>
+        <h3 style={{
+          margin: '0 0 16px 0',
+          color: 'var(--secondary-color)',
+        }}>
+          📊 סיכום בישול
+        </h3>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+          gap: '16px',
+        }}>
+          <div style={{ textAlign: 'center', padding: '12px' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.95em', color: 'var(--text-secondary)' }}>
+              סה״כ בישולים
+            </p>
+            <p style={{
+              fontSize: '2em',
+              fontWeight: 700,
+              margin: 0,
+              color: 'var(--danger-color)',
+            }}>
+              {totalCount}
+            </p>
+          </div>
+          <div style={{ textAlign: 'center', padding: '12px' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.95em', color: 'var(--text-secondary)' }}>
+              הסתיימו
+            </p>
+            <p style={{
+              fontSize: '2em',
+              fontWeight: 700,
+              margin: 0,
+              color: 'var(--success-color)',
+            }}>
+              {completedCount}
+            </p>
+          </div>
+          <div style={{ textAlign: 'center', padding: '12px' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '0.95em', color: 'var(--text-secondary)' }}>
+              זמן נותר
+            </p>
+            <p style={{
+              fontSize: '1.8em',
+              fontWeight: 700,
+              margin: 0,
+              color: 'var(--warning-color)',
+            }}>
+              {Math.floor(totalRemainingCookingMinutes / 60)}:{String(totalRemainingCookingMinutes % 60).padStart(2, '0')}
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
