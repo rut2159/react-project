@@ -29,9 +29,8 @@ Built with **React + Vite**, the app combines multiple data sources and user set
 ---
 ## 🚀 Getting Started
 
-### Install dependencies
+### Install dependencies and run development server
 
 ```bash
 npm install
-Run development server
 npm run dev
